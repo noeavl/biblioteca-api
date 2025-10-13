@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Body } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { BooksService } from 'src/books/books.service';
@@ -22,10 +22,12 @@ export class FilesService {
 
   async uploadBookPDF(bookId: string, file: Express.Multer.File) {
     try {
-      const book = await this.bookService.findOne(bookId);
+      const book = await this.bookService.update(bookId, {
+        fileName: file.originalname,
+      });
 
       const secureUrl = `${this.configService.get('host')}/files/book/${file.filename}`;
-      return { secureUrl };
+      return { book, secureUrl };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }

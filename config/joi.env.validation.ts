@@ -9,5 +9,5 @@ export const JoiEnvValidationSchema = Joi.object({
   NODE_ENV: Joi.string()
     .valid('development', 'production')
     .default('development'),
-  MAX_PDF_SIZE: Joi.number().default(50),
+  SECRET: Joi.string().required(),
 });

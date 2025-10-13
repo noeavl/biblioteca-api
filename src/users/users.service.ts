@@ -6,6 +6,7 @@ import { User } from './schemas/user.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { RolesService } from 'src/roles/roles.service';
 import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.helper';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -19,12 +20,13 @@ export class UsersService {
   async create(
     createUserDto: CreateUserDto,
   ): Promise<HydratedDocument<User> | undefined> {
-    const { term, ...userData } = createUserDto;
+    const { term, password, ...userData } = createUserDto;
     try {
       const role = await this.roleService.findOne(term);
 
       const createdUser = new this.userModel({
         ...userData,
+        password: bcrypt.hashSync(password, 10),
         role: role._id,
       });
 
@@ -70,11 +72,19 @@ export class UsersService {
     return this.userModel.find().limit(10).skip(0).sort({ name: 1 });
   }
 
-  async findOne(id: string): Promise<HydratedDocument<User>> {
-    const userFound = await this.userModel.findOne({ id: id });
+  async findOne(term: string): Promise<HydratedDocument<User>> {
+    let userFound = await this.userModel.findOne({ id: term });
+
     if (!userFound) {
-      throw new NotFoundException(`User ${id} not found`);
+      userFound = await this.userModel
+        .findOne({ email: term })
+        .select('name email password');
     }
+
+    if (!userFound) {
+      throw new NotFoundException(`User ${term} not found`);
+    }
+
     return userFound;
   }
 

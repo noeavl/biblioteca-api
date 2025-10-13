@@ -6,13 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id/parse-mongo-id.pipe';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('authors')
+@UseGuards(AuthGuard)
 export class AuthorsController {
   constructor(private readonly authorsService: AuthorsService) {}
 

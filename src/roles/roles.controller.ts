@@ -1,8 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id/parse-mongo-id.pipe';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('roles')
+@UseGuards(AuthGuard)
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 

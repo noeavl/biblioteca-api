@@ -6,5 +6,6 @@ export const FileNamer = (
 ) => {
   const fileExtension = file.mimetype.split('/')[1];
   const fileName = `${uuid()}.${fileExtension}`;
+  file.originalname = fileName;
   callback(null, fileName);
 };

@@ -3,5 +3,5 @@ export default () => ({
   port: process.env.PORT,
   host: process.env.HOST,
   node_env: process.env.NODE_ENV,
-  maxpdf_size: process.env.MAX_PDF_SIZE,
+  jwt_secret: process.env.SECRET,
 });

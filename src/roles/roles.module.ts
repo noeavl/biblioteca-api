@@ -4,6 +4,8 @@ import { RolesController } from './roles.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoleSchema, Role } from './schemas/roles.schema';
 import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.helper';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.hel
         schema: RoleSchema,
       },
     ]),
+    JwtModule,
+    ConfigModule,
   ],
   controllers: [RolesController],
   providers: [RolesService, ExceptionHandlerHelper],

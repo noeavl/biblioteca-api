@@ -6,13 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id/parse-mongo-id.pipe';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('books')
+@UseGuards(AuthGuard)
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 

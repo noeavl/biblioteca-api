@@ -16,6 +16,5 @@ export const FileFilter = (
       false,
     );
   }
-
   callback(null, true);
 };

@@ -5,11 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Book, BookSchema } from './schemas/book.schema';
 import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.helper';
 import { AuthorsModule } from 'src/authors/authors.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Book.name, schema: BookSchema }]),
     AuthorsModule,
+    JwtModule,
+    ConfigModule,
   ],
   controllers: [BooksController],
   providers: [BooksService, ExceptionHandlerHelper],

@@ -10,6 +10,7 @@ import configuration from 'config/configuration';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthorsModule } from './authors/authors.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AuthorsModule } from './authors/authors.module';
     SeedModule,
     FilesModule,
     AuthorsModule,
+    AuthModule,
   ],
   controllers: [],
 })
