@@ -35,7 +35,7 @@ export class SeedService {
 
     const users: CreateUserDto[] = [
       {
-        term: 'admin',
+        role: 'admin',
         name: 'noe',
         email: 'admin@example.com',
         password: 'Password123.',
@@ -43,7 +43,7 @@ export class SeedService {
         status: true,
       },
       {
-        term: 'librarian',
+        role: 'librarian',
         name: 'maria',
         email: 'librarian@example.com',
         password: 'Password123.',
@@ -51,7 +51,7 @@ export class SeedService {
         status: true,
       },
       {
-        term: 'reader',
+        role: 'reader',
         name: 'juan',
         email: 'reader@example.com',
         password: 'Password123.',

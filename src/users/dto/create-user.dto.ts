@@ -12,7 +12,7 @@ import { CustomPasswordConfirmValidation } from 'src/common/validations/CustomPa
 
 export class CreateUserDto {
   @IsString()
-  term: string;
+  role: string;
   @IsString()
   @IsLowercase()
   @MaxLength(20)

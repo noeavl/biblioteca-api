@@ -22,8 +22,10 @@ export class AuthorsService {
       const author: Author = {
         person: personCreated,
       };
-      const authorCreated = await this.authorModel.insertOne(author);
-      return authorCreated;
+      await this.authorModel.insertOne(author);
+      return {
+        message: 'Author created successfully',
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }
@@ -54,13 +56,15 @@ export class AuthorsService {
   async update(id: string, updateAuthorDto: UpdateAuthorDto) {
     try {
       const { person } = await this.findOne(id);
-      const personUpdated = await this.personModel.findOneAndUpdate(
+      await this.personModel.findOneAndUpdate(
         { _id: person },
         updateAuthorDto,
         { new: true },
       );
 
-      return personUpdated;
+      return {
+        message: `Author ${id} updated successfully`,
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }
@@ -70,6 +74,9 @@ export class AuthorsService {
       const { person } = await this.findOne(id);
       await this.authorModel.deleteOne({ _id: id });
       await this.personModel.deleteOne({ _id: person });
+      return {
+        message: `Author ${id} removed successfully`,
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }

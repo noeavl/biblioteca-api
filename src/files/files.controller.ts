@@ -27,7 +27,6 @@ export class FilesController {
   @Get('book/:pdfName')
   findBookPDF(@Res() res: Response, @Param('pdfName') pdfName: string) {
     const path = this.filesService.getBookPDF(pdfName);
-    console.log(path);
     return res.sendFile(path);
   }
 

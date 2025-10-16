@@ -6,6 +6,7 @@ import { Book } from './schemas/book.schema';
 import { HydratedDocument, isValidObjectId, Model } from 'mongoose';
 import { ExceptionHandlerHelper } from '../common/helpers/exception-handler.helper';
 import { AuthorsService } from 'src/authors/authors.service';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class BooksService {
@@ -14,18 +15,24 @@ export class BooksService {
     private readonly bookModel: Model<Book>,
     private readonly exceptionHandlerHelper: ExceptionHandlerHelper,
     private readonly authorService: AuthorsService,
+    private readonly categoryService: CategoriesService,
   ) {}
-  async create(
-    createBookDto: CreateBookDto,
-  ): Promise<HydratedDocument<Book> | undefined> {
+  async create(createBookDto: CreateBookDto) {
     try {
+      const categoryFound = await this.categoryService.findOne(
+        createBookDto.categoryId,
+      );
       const author = await this.authorService.findOne(createBookDto.authorId);
       const createdBook = await this.bookModel.insertOne({
         author: author,
         ...createBookDto,
+        category: categoryFound,
       });
+      await this.categoryService.addBooks(categoryFound, createdBook);
       await this.authorService.addBooks(author, createdBook);
-      return createdBook;
+      return {
+        message: 'Book created successfully',
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }
@@ -55,10 +62,12 @@ export class BooksService {
   async update(id: string, updateBookDto: UpdateBookDto) {
     try {
       const bookFound = await this.findOne(id);
-      const bookUpdated = await this.bookModel
+      await this.bookModel
         .findByIdAndUpdate(bookFound, updateBookDto, { new: true })
         .populate({ path: 'author', populate: { path: 'person' } });
-      return bookUpdated;
+      return {
+        message: 'Book updated successfully',
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }
@@ -68,5 +77,8 @@ export class BooksService {
     const book = await this.findOne(id);
     await this.authorService.removeBook(book.author, id);
     await this.bookModel.deleteOne({ _id: id });
+    return {
+      message: `Book ${id} removed successfully`,
+    };
   }
 }

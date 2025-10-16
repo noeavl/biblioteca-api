@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, isValidObjectId, Model } from 'mongoose';
 import { RolesService } from 'src/roles/roles.service';
 import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.helper';
 import * as bcrypt from 'bcrypt';
@@ -17,25 +17,20 @@ export class UsersService {
     private readonly exceptionHandlerHelper: ExceptionHandlerHelper,
   ) {}
 
-  async create(
-    createUserDto: CreateUserDto,
-  ): Promise<HydratedDocument<User> | undefined> {
-    const { term, password, ...userData } = createUserDto;
+  async create(createUserDto: CreateUserDto) {
+    const { role, password, ...userData } = createUserDto;
     try {
-      const role = await this.roleService.findOne(term);
+      const roleFound = await this.roleService.findOne(role);
 
       const createdUser = new this.userModel({
         ...userData,
         password: bcrypt.hashSync(password, 10),
-        role: role._id,
+        role: roleFound._id,
       });
 
-      const savedUser = await createdUser.save();
+      await createdUser.save();
 
-      // Actualizar el rol con el ID del usuario creado
-      await this.roleService.addUserToRole(role._id.toString(), savedUser._id);
-
-      return savedUser;
+      return createdUser;
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error, 'User');
     }
@@ -43,24 +38,18 @@ export class UsersService {
 
   async batchCreate(createUsersDto: CreateUserDto[]) {
     try {
-      const terms = [...new Set(createUsersDto.map((dto) => dto.term))];
+      const terms = [...new Set(createUsersDto.map((dto) => dto.role))];
 
       const rolesFound = await this.roleService.findAll(terms);
 
       const roleMap = new Map(rolesFound.map((role) => [role.name, role._id]));
 
-      const users = createUsersDto.map(({ term, ...data }) => ({
+      const users = createUsersDto.map(({ role, ...data }) => ({
         ...data,
-        role: roleMap.get(term),
+        role: roleMap.get(role),
       }));
 
       const createdUsers = await this.userModel.insertMany(users);
-
-      for (const user of createdUsers) {
-        if (user.role) {
-          await this.roleService.addUserToRole(user.role.toString(), user._id);
-        }
-      }
 
       return createdUsers;
     } catch (error) {
@@ -73,7 +62,11 @@ export class UsersService {
   }
 
   async findOne(term: string): Promise<HydratedDocument<User>> {
-    let userFound = await this.userModel.findOne({ id: term });
+    let userFound: HydratedDocument<User> | null = null;
+
+    if (isValidObjectId(term)) {
+      userFound = await this.userModel.findOne({ _id: term });
+    }
 
     if (!userFound) {
       userFound = await this.userModel
@@ -88,10 +81,7 @@ export class UsersService {
     return userFound;
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<HydratedDocument<User>> {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const userFound = await this.findOne(id);
 
     try {
@@ -100,6 +90,20 @@ export class UsersService {
       this.exceptionHandlerHelper.handleExceptions(error, 'User');
     }
 
-    return userFound;
+    return {
+      message: `User ${id} updated successfully`,
+    };
+  }
+
+  async remove(term: string) {
+    try {
+      const userFound = await this.findOne(term);
+      await this.userModel.deleteOne({ _id: userFound._id });
+      return {
+        message: 'User removed successfully',
+      };
+    } catch (error) {
+      this.exceptionHandlerHelper.handleExceptions(error);
+    }
   }
 }

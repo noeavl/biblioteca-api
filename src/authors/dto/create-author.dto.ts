@@ -1,8 +1,3 @@
-import { IsString } from 'class-validator';
+import { CreatePersonDto } from 'src/common/dto/person/create-person.dto';
 
-export class CreateAuthorDto {
-  @IsString()
-  firstName: string;
-  @IsString()
-  lastName: string;
-}
+export class CreateAuthorDto extends CreatePersonDto {}

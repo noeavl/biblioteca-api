@@ -1,4 +1,11 @@
-import { IsMongoId, IsNumber, IsString, Max, Min } from 'class-validator';
+import {
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class CreateBookDto {
   @IsString()
@@ -10,4 +17,8 @@ export class CreateBookDto {
   @Min(1)
   @Max(new Date().getFullYear() + 5)
   publicationYear: number;
+  @IsString()
+  @IsMongoId()
+  @IsOptional()
+  categoryId: string;
 }

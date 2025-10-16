@@ -46,11 +46,4 @@ export class RolesService {
 
     return roles;
   }
-
-  async addUserToRole(roleId: string, userId: any) {
-    await this.roleModel.updateOne(
-      { _id: roleId },
-      { $addToSet: { users: userId } },
-    );
-  }
 }

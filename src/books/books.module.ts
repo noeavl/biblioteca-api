@@ -7,6 +7,7 @@ import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.hel
 import { AuthorsModule } from 'src/authors/authors.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { CategoriesModule } from 'src/categories/categories.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthorsModule,
     JwtModule,
     ConfigModule,
+    CategoriesModule,
   ],
   controllers: [BooksController],
   providers: [BooksService, ExceptionHandlerHelper],
