@@ -19,8 +19,12 @@ import { FileNamer } from 'src/common/helpers/fileNamer.helper';
 import type { Response } from 'express';
 import { FileFilter } from 'src/common/helpers/file.helper';
 import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id/parse-mongo-id.pipe';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 @Controller('files')
+@UseGuards(AuthGuard, RolesGuard)
+@Roles('admin', 'librarian')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 

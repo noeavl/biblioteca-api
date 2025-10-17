@@ -12,10 +12,13 @@ import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id/parse-mongo-id.pipe';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('books')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
+@Roles('admin', 'librarian')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
@@ -28,11 +31,13 @@ export class BooksController {
   }
 
   @Get()
+  @Roles('reader')
   findAll() {
     return this.booksService.findAll();
   }
 
   @Get(':id')
+  @Roles('reader')
   findOne(@Param('id', new ParseMongoIdPipe()) id: string) {
     return this.booksService.findOne(id);
   }

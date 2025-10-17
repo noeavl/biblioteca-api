@@ -71,7 +71,8 @@ export class UsersService {
     if (!userFound) {
       userFound = await this.userModel
         .findOne({ email: term })
-        .select('name email password');
+        .populate('role', 'name')
+        .select('name email password role');
     }
 
     if (!userFound) {

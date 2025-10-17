@@ -4,6 +4,8 @@ import { CategoriesController } from './categories.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Category, CategorySchema } from './schemas/category.schema';
 import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.helper';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.hel
         schema: CategorySchema,
       },
     ]),
+    JwtModule,
+    ConfigModule,
   ],
   controllers: [CategoriesController],
   providers: [CategoriesService, ExceptionHandlerHelper],
