@@ -15,6 +15,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ReadersModule } from './readers/readers.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { CollectionsModule } from './collections/collections.module';
+import { ReadingHistoryModule } from './reading-history/reading-history.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CollectionsModule } from './collections/collections.module';
     ReadersModule,
     FavoritesModule,
     CollectionsModule,
+    ReadingHistoryModule,
   ],
   controllers: [],
 })
