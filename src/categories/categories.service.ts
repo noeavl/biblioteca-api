@@ -10,12 +10,17 @@ import { Category } from './schemas/category.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { ExceptionHandlerHelper } from 'src/common/helpers/exception-handler.helper';
 import { Book } from 'src/books/schemas/book.schema';
+import { Favorite } from 'src/favorites/schemas/favorite.schema';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name)
     private readonly categoryModel: Model<Category>,
+    @InjectModel(Book.name)
+    private readonly bookModel: Model<Book>,
+    @InjectModel(Favorite.name)
+    private readonly favoriteModel: Model<Favorite>,
     private readonly exceptionHandlerHelper: ExceptionHandlerHelper,
   ) {}
   async create(createCategoryDto: CreateCategoryDto) {
@@ -38,7 +43,57 @@ export class CategoriesService {
   }
 
   async findAll() {
-    return await this.categoryModel.find();
+    const categories = await this.categoryModel.find().lean();
+
+    const categoriesWithFeaturedBook = await Promise.all(
+      categories.map(async (category) => {
+        if (!category.books || category.books.length === 0) {
+          return { ...category, featuredBookCover: null };
+        }
+
+        // Obtener el conteo de favoritos para cada libro de la categoría
+        const booksWithFavoriteCount = await Promise.all(
+          category.books.map(async (bookId) => {
+            const favoriteCount = await this.favoriteModel.countDocuments({
+              books: bookId,
+            });
+            return { bookId, favoriteCount };
+          }),
+        );
+
+        // Ordenar por favoritos (descendente)
+        booksWithFavoriteCount.sort(
+          (a, b) => b.favoriteCount - a.favoriteCount,
+        );
+
+        let featuredBookId;
+
+        // Si el libro con más favoritos tiene al menos 1 favorito, usarlo
+        if (booksWithFavoriteCount[0].favoriteCount > 0) {
+          featuredBookId = booksWithFavoriteCount[0].bookId;
+        } else {
+          // Si no hay favoritos, obtener el libro más reciente
+          const mostRecentBook = await this.bookModel
+            .findOne({ _id: { $in: category.books } })
+            .sort({ _id: -1 })
+            .select('_id');
+
+          featuredBookId = mostRecentBook?._id;
+        }
+
+        // Obtener la imagen de portada del libro destacado
+        const featuredBook = await this.bookModel
+          .findById(featuredBookId)
+          .select('coverImage');
+
+        return {
+          ...category,
+          featuredBookCover: featuredBook?.coverImage || null,
+        };
+      }),
+    );
+
+    return categoriesWithFeaturedBook;
   }
 
   async findOne(term: string) {

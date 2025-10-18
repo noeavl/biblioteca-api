@@ -31,8 +31,13 @@ export class AuthorsService {
     }
   }
 
-  async findAll() {
-    return await this.authorModel.find().populate('person');
+  async findAll(skip: number = 0, limit: number = 10) {
+    return await this.authorModel
+      .find()
+      .populate('person')
+      .skip(skip)
+      .limit(limit)
+      .sort({ firstName: 1 });
   }
 
   async findOne(term: string): Promise<HydratedDocument<Author>> {
@@ -54,13 +59,17 @@ export class AuthorsService {
   }
 
   async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+    const { fileName, ...personData } = updateAuthorDto;
     try {
-      const { person } = await this.findOne(id);
-      await this.personModel.findOneAndUpdate(
-        { _id: person },
-        updateAuthorDto,
-        { new: true },
-      );
+      const authorFound = await this.findOne(id);
+
+      if (fileName !== undefined) {
+        authorFound.fileName = fileName;
+      }
+
+      await authorFound.save();
+
+      await this.personModel.updateOne(authorFound.person, personData);
 
       return {
         message: `Author ${id} updated successfully`,

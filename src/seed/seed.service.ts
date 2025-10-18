@@ -5,6 +5,7 @@ import { CreateRoleDto } from 'src/roles/dto/create-role-.dto';
 import { RolesService } from 'src/roles/roles.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SeedService {
@@ -17,6 +18,14 @@ export class SeedService {
   async executeSeed() {
     await this.connection.collection('roles').deleteMany();
     await this.connection.collection('users').deleteMany();
+    await this.connection.collection('people').deleteMany();
+    await this.connection.collection('favorites').deleteMany();
+    await this.connection.collection('readers').deleteMany();
+    await this.connection.collection('collections').deleteMany();
+    await this.connection.collection('categories').deleteMany();
+    await this.connection.collection('readinghistories').deleteMany();
+    await this.connection.collection('authors').deleteMany();
+    await this.connection.collection('books').deleteMany();
 
     const roles: CreateRoleDto[] = [
       {
@@ -38,7 +47,7 @@ export class SeedService {
         role: 'admin',
         name: 'noe',
         email: 'admin@example.com',
-        password: 'Password123.',
+        password: bcrypt.hashSync('Password123.', 10),
         passwordConfirm: 'Password123.',
         status: true,
       },
@@ -46,7 +55,7 @@ export class SeedService {
         role: 'librarian',
         name: 'maria',
         email: 'librarian@example.com',
-        password: 'Password123.',
+        password: bcrypt.hashSync('Password123.', 10),
         passwordConfirm: 'Password123.',
         status: true,
       },
@@ -54,7 +63,7 @@ export class SeedService {
         role: 'reader',
         name: 'juan',
         email: 'reader@example.com',
-        password: 'Password123.',
+        password: bcrypt.hashSync('Password123.', 10),
         passwordConfirm: 'Password123.',
         status: true,
       },

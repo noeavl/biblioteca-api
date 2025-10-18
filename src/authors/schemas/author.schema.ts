@@ -16,6 +16,8 @@ export class Author {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
   })
   books?: Book[];
+  @Prop()
+  fileName?: string;
 }
 
 export const AuthorSchema = SchemaFactory.createForClass(Author);

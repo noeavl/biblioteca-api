@@ -6,4 +6,8 @@ export class UpdateBookDto extends PartialType(CreateBookDto) {
   @IsString()
   @IsOptional()
   fileName?: string;
+
+  @IsString()
+  @IsOptional()
+  coverImage?: string;
 }

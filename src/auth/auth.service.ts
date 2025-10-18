@@ -26,7 +26,14 @@ export class AuthService {
       role: userFound.role.name,
     };
     try {
-      return { access_token: await this.jwtService.signAsync(payload) };
+      return {
+        user: {
+          name: userFound.name,
+          email: userFound.email,
+          role: userFound.role.name,
+        },
+        access_token: await this.jwtService.signAsync(payload),
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
     }

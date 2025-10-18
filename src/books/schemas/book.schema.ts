@@ -25,6 +25,8 @@ export class Book {
   publicationYear: number;
   @Prop()
   fileName?: string;
+  @Prop()
+  coverImage?: string;
   @Prop({
     required: true,
     index: true,
