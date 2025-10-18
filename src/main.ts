@@ -19,9 +19,9 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Biblioteca Virtual RESTFull API')
+    .setTitle('Biblioteca Virtual RESTFul API')
     .setDescription(
-      'Documentación oficial de la RESTFull API de Biblioteca virtual',
+      'Documentación oficial de la RESTFul API de Biblioteca virtual',
     )
     .setVersion('1.0')
     .build();
