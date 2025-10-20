@@ -66,7 +66,7 @@ export class BooksService {
     if (!bookFound) {
       bookFound = await this.bookModel
         .findOne({ name: term })
-        .populate('author');
+        .populate('author', '-books');
     }
 
     if (!bookFound) throw new NotFoundException(`Book ${term} not found`);
