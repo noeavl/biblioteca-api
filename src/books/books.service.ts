@@ -38,8 +38,22 @@ export class BooksService {
     }
   }
 
-  async findAll() {
-    return await this.bookModel.find();
+  async findAll(limit: number = 10, skip: number = 0) {
+    return await this.bookModel
+      .find()
+      .populate([
+        {
+          path: 'author',
+          select: '-books',
+          populate: { path: 'person' },
+        },
+        {
+          path: 'category',
+          select: '-books',
+        },
+      ])
+      .limit(limit)
+      .skip(skip);
   }
 
   async findOne(term: string): Promise<HydratedDocument<Book>> {
