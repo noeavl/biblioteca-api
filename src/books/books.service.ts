@@ -59,14 +59,18 @@ export class BooksService {
   async findOne(term: string): Promise<HydratedDocument<Book>> {
     let bookFound: HydratedDocument<Book> | null = null;
     if (isValidObjectId(term)) {
-      bookFound = await this.bookModel
-        .findOne({ _id: term })
-        .populate('author', '-books');
+      bookFound = await this.bookModel.findOne({ _id: term }).populate({
+        path: 'author',
+        select: '-books',
+        populate: { path: 'person' },
+      });
     }
     if (!bookFound) {
-      bookFound = await this.bookModel
-        .findOne({ name: term })
-        .populate('author', '-books');
+      bookFound = await this.bookModel.findOne({ name: term }).populate({
+        path: 'author',
+        select: '-books',
+        populate: { path: 'person' },
+      });
     }
 
     if (!bookFound) throw new NotFoundException(`Book ${term} not found`);
