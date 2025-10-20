@@ -61,7 +61,7 @@ export class BooksService {
     if (isValidObjectId(term)) {
       bookFound = await this.bookModel
         .findOne({ _id: term })
-        .populate('author');
+        .populate('author', '-books');
     }
     if (!bookFound) {
       bookFound = await this.bookModel
