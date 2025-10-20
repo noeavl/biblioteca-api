@@ -8,7 +8,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: 'https://biblioteca-api-7eq8.onrender.com',
     credentials: true,
   });
   app.useGlobalPipes(
