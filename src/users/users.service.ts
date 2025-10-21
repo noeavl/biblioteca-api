@@ -58,21 +58,26 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.userModel.find().limit(10).skip(0).sort({ name: 1 });
+    return this.userModel
+      .find()
+      .limit(10)
+      .skip(0)
+      .sort({ name: 1 })
+      .populate('role');
   }
 
   async findOne(term: string): Promise<HydratedDocument<User>> {
     let userFound: HydratedDocument<User> | null = null;
 
     if (isValidObjectId(term)) {
-      userFound = await this.userModel.findOne({ _id: term });
+      userFound = await this.userModel.findOne({ _id: term }).populate('role');
     }
 
     if (!userFound) {
       userFound = await this.userModel
         .findOne({ email: term })
         .populate('role', 'name')
-        .select('name email password role');
+        .select('name email password role status');
     }
 
     if (!userFound) {
@@ -83,17 +88,31 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const userFound = await this.findOne(id);
-
     try {
-      await userFound.updateOne(updateUserDto);
+      const userFound = await this.findOne(id);
+      if (updateUserDto) {
+        const { role, password, passwordConfirm, ...userData }: UpdateUserDto =
+          updateUserDto;
+
+        if (password && password === passwordConfirm) {
+          userFound.password = bcrypt.hashSync(password, 10);
+        }
+
+        if (role) {
+          const roleFound = await this.roleService.findOne(role);
+          userFound.role = roleFound;
+        }
+
+        Object.assign(userFound, userData);
+
+        await userFound.save();
+      }
+      return {
+        message: `User ${id} updated successfully`,
+      };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error, 'User');
     }
-
-    return {
-      message: `User ${id} updated successfully`,
-    };
   }
 
   async remove(term: string) {

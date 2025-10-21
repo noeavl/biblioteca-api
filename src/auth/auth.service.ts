@@ -17,6 +17,11 @@ export class AuthService {
     const { password, email } = loginUserDto;
     const userFound = await this.userService.findOne(email);
 
+    console.log(userFound);
+
+    if (!userFound.status)
+      throw new UnauthorizedException('User account is inactive');
+
     if (!userFound || !bcrypt.compareSync(password, userFound.password))
       throw new UnauthorizedException('Invalid Credentials');
 

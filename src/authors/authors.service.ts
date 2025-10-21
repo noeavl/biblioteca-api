@@ -22,9 +22,10 @@ export class AuthorsService {
       const author: Author = {
         person: personCreated,
       };
-      await this.authorModel.insertOne(author);
+      const authorCreated = await this.authorModel.insertOne(author);
       return {
         message: 'Author created successfully',
+        author: authorCreated,
       };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);

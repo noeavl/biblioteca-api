@@ -7,6 +7,7 @@ import { HydratedDocument, isValidObjectId, Model } from 'mongoose';
 import { ExceptionHandlerHelper } from '../common/helpers/exception-handler.helper';
 import { AuthorsService } from 'src/authors/authors.service';
 import { CategoriesService } from 'src/categories/categories.service';
+import { ResponseBookDto } from './dto/response-book.dto';
 
 @Injectable()
 export class BooksService {
@@ -28,10 +29,16 @@ export class BooksService {
         ...createBookDto,
         category: categoryFound,
       });
+      const book: ResponseBookDto = {
+        _id: createdBook.id as string,
+        title: createdBook.title,
+        publicationYear: createdBook.publicationYear,
+      };
       await this.categoryService.addBooks(categoryFound, createdBook);
       await this.authorService.addBooks(author, createdBook);
       return {
         message: 'Book created successfully',
+        book,
       };
     } catch (error) {
       this.exceptionHandlerHelper.handleExceptions(error);
@@ -64,6 +71,10 @@ export class BooksService {
           path: 'author',
           select: '-books',
           populate: { path: 'person' },
+        },
+        {
+          path: 'category',
+          select: '-books',
         },
       ]);
     }

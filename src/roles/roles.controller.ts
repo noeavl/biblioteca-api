@@ -11,6 +11,11 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
+  @Get()
+  findAll() {
+    return this.rolesService.findAll();
+  }
+
   @Get(':id')
   findOne(
     @Param(':id', new ParseMongoIdPipe())
